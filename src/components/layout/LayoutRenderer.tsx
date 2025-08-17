@@ -91,7 +91,26 @@ const LayoutRenderer: React.FC<Props> = ({ inLayout }) => {
             {layout.length === 0 && <Grid sx={{ xs: 12 }}>
               <Typography align="center" color="text.secondary" sx={{ p: 4 }}>Đang tải cấu hình...</Typography>
             </Grid>}
+            {layout.map((item, index, arr) => {
+        const Component = componentRegistry[item.type];
 
+        if (!Component) {
+          return (
+            <div key={item.id} className="p-2 border border-red-400 text-red-600">
+              Chưa tồn tại kiểu: {item.type}
+            </div>
+          );
+        }
+
+        return (
+          <Component
+            key={item.id}
+            index={index} 
+            length={arr.length}
+            {...item.config}
+          />
+        );
+      })}
             {layout.map((item, index, arr) => <LayoutItem Component={componentRegistry[item.type]} item={item} index={index} length={arr.length} />)}
 
             <Grid sx={{ xs: 12 }}>

@@ -1,70 +1,22 @@
 import { Box, Button, CircularProgress, Grid, IconButton, Paper, Step, StepLabel, Stepper, Typography } from "@mui/material";
 import { StepperConfig } from "../../types/step";
-import { AddComponentContext, DynFormData, Errors, LayoutItem } from "../../types";
+import { AddComponentContext, DynFormData, Errors, LayoutItem, StepperLayoutItem } from "../../types";
 import { useState } from "react";
 import ConfigurableWrapper from "./ConfigurableWrapper";
 import DynamicField from "./DynamicField";
 import DynamicTableComponent from "./DynamicTableComponent";
 import { Add, AddCircleOutline, Settings } from "@mui/icons-material";
+import { useDynamicLayout } from "../../hooks/useDynamicLayout";
 
-interface StepperComponentProps {
-    componentId: string;
-    componentConfig: StepperConfig;
-    formData: DynFormData;
-    errors: Errors;
-
-    onFieldChange: (fieldId: string,
-        value: any) => void;
-
-    onTableChange: (tableId: string,
-        data: any[]) => void;
-
-    onAddStep: (stepperComponentId: string) => void;
-
-    onOpenConfig: (itemId: string) => void;
-
-    onOpenTableConfig: (itemId: string) => void;
-
-    onDeleteItem: (itemId: string) => void;
-
-    onValidateStep: (itemsToValidate: LayoutItem[]) => Errors;
-
-    onOpenStepConfig: (componentId: string,
-        stepId: string) => void;
-
-    onExecuteAction: (actionName: string) => Promise<void>;
-
-    onMoveItem: (itemId: string,
-        direction: 'up' | 'down') => void;
-
-    onOpenAddComponentDialog: (context: AddComponentContext) => void;
-}
-
-const StepperComponent: React.FC<StepperComponentProps> = ({
-    componentId,
-    componentConfig,
-    formData,
-    onFieldChange,
-    onTableChange,
-    onAddStep,
-    onOpenConfig,
-    onDeleteItem,
-    onOpenTableConfig,
-    errors,
-    onValidateStep,
-    onOpenStepConfig,
-    onExecuteAction,
-    onMoveItem,
-    onOpenAddComponentDialog
-}) => {
+const StepperComponent: React.FC<StepperLayoutItem> = ({ id,steps }) => {
+    const { validateStepFields,handleOpenAddComponentDialog,addStepToStepperComponent,handleOpenStepConfig } = useDynamicLayout()
     const [activeStep, setActiveStep] = useState(0);
     const [isStepLoading, setStepLoading] = useState(false);
-    const steps = componentConfig.steps || [];
 
     const handleNext = async () => {
         const currentStep = steps[activeStep];
         const stepErrors =
-            onValidateStep(currentStep.items);
+            validateStepFields(currentStep.items);
         if (Object.keys(stepErrors).length > 0) {
             return;
         }
@@ -145,8 +97,7 @@ const StepperComponent: React.FC<StepperComponentProps> = ({
                         onClick={(e) => {
                             e.stopPropagation();
 
-                            onOpenStepConfig(componentId,
-                                step.id);
+                            handleOpenStepConfig(id, step.id);
                         }} title="Chỉnh sửa bước">
                             <Settings sx={{ fontSize: '1rem' }} />
                         </IconButton>
@@ -158,19 +109,12 @@ const StepperComponent: React.FC<StepperComponentProps> = ({
                     ? (<Box>
                         <Typography>Tất cả các bước đã hoàn thành!</Typography>
                     </Box>) : (<Box>
-                        <Grid container spacing={3}>{steps[activeStep].items.map((item,
-                            idx,
-                            arr) => renderLayoutItem(item,
-                                idx,
-                                arr))}<Grid sx={{ xs: 12 }} >
-                                <Button variant="outlined" size="small" startIcon={<Add />}
-                                    onClick={() =>
-                                        onOpenAddComponentDialog({
-                                            parentId: componentId,
-                                            parentType: 'step',
-                                            stepIndex: activeStep
-                                        })} sx={{ mt: 2 }}>Thêm thành phần vào Bước</Button>
-                            </Grid>
+                        <Grid container spacing={3}>{steps[activeStep].items.map((item, idx, arr) => renderLayoutItem(item, idx, arr))}<Grid sx={{ xs: 12 }} >
+                            <Button variant="outlined" size="small" startIcon={<Add />}
+                                onClick={() => handleOpenAddComponentDialog({ parentId: id, parentType: 'step', stepIndex: activeStep })} sx={{ mt: 2 }}>
+                                Thêm thành phần vào Bước
+                            </Button>
+                        </Grid>
                         </Grid>
                         <Box sx={{
                             display: 'flex',
@@ -196,7 +140,7 @@ const StepperComponent: React.FC<StepperComponentProps> = ({
             borderColor: 'divider'
         }}>
             <Button
-                onClick={() => onAddStep(componentId)} color="primary" startIcon={<AddCircleOutline />} size="small">Thêm Bước</Button>
+                onClick={() => addStepToStepperComponent(id)} color="primary" startIcon={<AddCircleOutline />} size="small">Thêm Bước</Button>
         </Box>
     </Paper>);
 };

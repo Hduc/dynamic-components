@@ -1,21 +1,21 @@
 import React from "react";
-import { LayoutItem as ItemType } from "../../types";
+import { LayoutItem as ItemType, LayoutItemType } from "../../types";
 import { Box, Button, Paper, Typography } from "@mui/material";
 import { AutoAwesome } from "@mui/icons-material";
 import ConfigurableWrapper from "../controls/ConfigurableWrapper";
 
 interface LayoutItemProps {
   item: ItemType;
-  index:number
-  length:number
-  Component: React.ComponentType<any>;
+  index: number
+  length: number
+  Component: LayoutItemType;
 }
 
 const LayoutItem: React.FC<LayoutItemProps> = ({ item, Component, index, length }) => {
- 
-  return (<ConfigurableWrapper  type={item.type} id={item.id} index={index} length={length} >
-      <Component {...item} />
-      </ConfigurableWrapper>
+
+  return (<ConfigurableWrapper type={item.type} id={item.id} index={index} length={length} >
+    <Component {...item} />
+  </ConfigurableWrapper>
   );
 };
 

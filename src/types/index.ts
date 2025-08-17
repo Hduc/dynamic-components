@@ -1,3 +1,4 @@
+import { ComponentType } from "react";
 import { ButtonConfig } from "./button";
 import { FieldConfig } from "./field";
 import { StepperConfig } from "./step";
@@ -14,25 +15,34 @@ export type AddComponentContext = {
   tabIndex?: number;
   stepIndex?: number;
 };
+
+export interface LayoutItemConfigMap {
+  field: FieldConfig;
+  table: TableConfig;
+  tabs: TabsConfig;
+  stepper: StepperConfig;
+  button: ButtonConfig;
+}
 export type LayoutItemConfig = FieldConfig | TableConfig | TabsConfig | StepperConfig  | ButtonConfig;
-export interface BaseLayoutItem<T extends 'field' | 'table' | 'tabs' | 'stepper' | 'modal-button' | 'button',
-  C extends LayoutItemConfig> {
+
+export interface BaseLayoutItem<T extends keyof LayoutItemConfigMap> {
   id: string;
   type: T;
-  config: C;
+  config: LayoutItemConfigMap[T];
 }
-export type FieldLayoutItem = BaseLayoutItem<'field',  FieldConfig>;
-export type TableLayoutItem = BaseLayoutItem<'table',  TableConfig>;
-export type TabsLayoutItem = BaseLayoutItem<'tabs',  TabsConfig>;
-export type StepperLayoutItem = BaseLayoutItem<'stepper',  StepperConfig>;
-export type ButtonLayoutItem = BaseLayoutItem<'button',  ButtonConfig>;
-
-export type LayoutItem = FieldLayoutItem | TableLayoutItem | TabsLayoutItem | StepperLayoutItem | ButtonLayoutItem;
+export type LayoutItem = {
+  [K in keyof LayoutItemConfigMap]: BaseLayoutItem<K>;
+}[keyof LayoutItemConfigMap];
 
 export type Layout = LayoutItem[];
 
+// type liệt kê tên các item hợp lệ
+export type LayoutItemType = LayoutItem["type"];
 
-
+// type mapping: key là LayoutItemType, value là component React
+export type ComponentRegistry = {
+  [K in keyof LayoutItemConfigMap]: ComponentType<LayoutItemConfigMap[K]>;
+};
 export interface IDynamicForm {
   id?: string
   parentId?: string

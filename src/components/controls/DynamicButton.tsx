@@ -1,21 +1,20 @@
 import { Button } from "@mui/material";
-import { ButtonConfig } from "./types";
+import { ButtonConfig } from "../../types/button";
+import { useDynamicLayout } from "../../hooks/useDynamicLayout";
 
-interface DynamicButtonProps {
-    componentConfig: ButtonConfig;
-    onAction: (actionName: string) => void;
-}
-const DynamicButton: React.FC<DynamicButtonProps> = ({ componentConfig, onAction }) => {
-    const { label, config } = componentConfig;
+const DynamicButton: React.FC<ButtonConfig> = ({ label,config }) => {
+    const {executeAction} = useDynamicLayout()
+    
     const handleClick = () => {
-        if (config.onClickAction) {
-            onAction(config.onClickAction);
+        if (config && config.onClickAction) {
+            executeAction(config.onClickAction);
         }
     };
+
     return (
         <Button
-            variant={config.variant || 'contained'}
-            color={config.color || 'primary'}
+            variant={config?.variant || 'contained'}
+            color={config?.color || 'primary'}
             onClick={handleClick}
             fullWidth
         >

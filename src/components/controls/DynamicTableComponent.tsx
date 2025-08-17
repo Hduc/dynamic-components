@@ -27,50 +27,39 @@ import { DynFormData } from '../../types'
 import { mockApi } from '../../config/mockApi';
 import { evaluateExpression } from '../common/fuc_common';
 import { Add, Delete } from '@mui/icons-material';
+import { useDynamicLayout } from '../../hooks/useDynamicLayout';
 
-interface DynamicTableComponentProps {
-    tableConfig: TableConfig;
-    tableData: any[];
 
-    onTableChange: (tableId: string,
-        data: any[]) => void;
-}
-
-const DynamicTableComponent: React.FC<DynamicTableComponentProps> = ({ tableConfig,
-    tableData,
-    onTableChange }) => {
-    const [localColumns,
-        setLocalColumns] = useState<TableColumn[]>(tableConfig.columns);
-    const [loading,
-        setLoading] = useState(false);
-    const [dynamicOptions,
-        setDynamicOptions] = useState<{ [key: string]: FieldOption[] }>({});
-
+const DynamicTableComponent: React.FC<TableConfig> = ({ id, columns, columnsApiUrl, dataApiUrl, label }) => {
+    const { formData, handleTableChange } = useDynamicLayout()
+    const [localColumns, setLocalColumns] = useState<TableColumn[]>(columns);
+    const [loading, setLoading] = useState(false);
+    const [dynamicOptions, setDynamicOptions] = useState<{ [key: string]: FieldOption[] }>({});
+    const tableData = formData[id]?.value || [] as any[]
     useEffect(() => {
         let isMounted = true;
         const fetchData = async () => {
-            if (!tableConfig.columnsApiUrl && !tableConfig.dataApiUrl) {
-                setLocalColumns(tableConfig.columns);
+            if (!columnsApiUrl && !dataApiUrl) {
+                setLocalColumns(columns);
                 return;
             }
             setLoading(true);
             try {
-                let columns = tableConfig.columns;
-                if (tableConfig.columnsApiUrl) {
-                    if (tableConfig.columnsApiUrl === '/api/products/columns') {
-                        columns = await mockApi.getProductsColumns();
+                let tempColumns = columns;
+                if (columnsApiUrl) {
+                    if (columnsApiUrl === '/api/products/columns') {
+                        tempColumns = await mockApi.getProductsColumns();
                     }
                 }
-                if (isMounted) setLocalColumns(columns);
+                if (isMounted) setLocalColumns(tempColumns);
 
-                if (tableConfig.dataApiUrl) {
+                if (dataApiUrl) {
                     let data = [];
-                    if (tableConfig.dataApiUrl === '/api/products/data') {
+                    if (dataApiUrl === '/api/products/data') {
                         data = await mockApi.getProductsData();
                     }
                     if (isMounted)
-                        onTableChange(tableConfig.id,
-                            data);
+                        handleTableChange(id, data);
                 }
             } catch (error) {
                 console.error("Failed to load table data:",
@@ -81,16 +70,10 @@ const DynamicTableComponent: React.FC<DynamicTableComponentProps> = ({ tableConf
         };
 
         fetchData();
-
         return () => {
             isMounted = false;
         };
-    },
-        [tableConfig.id,
-        tableConfig.columnsApiUrl,
-        tableConfig.dataApiUrl,
-        tableConfig.columns,
-            onTableChange]);
+    }, [id, columnsApiUrl, dataApiUrl, columns, handleTableChange]);
 
     useEffect(() => {
         const fetchAllOptions = async () => {
@@ -139,7 +122,7 @@ const DynamicTableComponent: React.FC<DynamicTableComponentProps> = ({ tableConf
 
         newTableData[rowIndex] = updatedRow;
 
-        onTableChange(tableConfig.id, newTableData);
+        handleTableChange(id, newTableData);
     };
 
     const addRow = () => {
@@ -163,17 +146,13 @@ const DynamicTableComponent: React.FC<DynamicTableComponentProps> = ({ tableConf
         });
 
 
-        onTableChange(tableConfig.id,
-            [...(tableData || []),
-                newRow]);
+        handleTableChange(id, [...(tableData || []), newRow]);
     };
 
     const deleteRow = (rowIndex: number) => {
-        const newTableData = tableData.filter((_,
-            index) => index !== rowIndex);
+        const newTableData = (tableData as any[]).filter((_, index: number) => index !== rowIndex);
 
-        onTableChange(tableConfig.id,
-            newTableData);
+        handleTableChange(id, newTableData);
     };
 
     const renderCellInput = (row: any,
@@ -181,21 +160,25 @@ const DynamicTableComponent: React.FC<DynamicTableComponentProps> = ({ tableConf
         col: TableColumn) => {
         const value = row[col.id] || '';
         switch (col.type) {
-            case 'select': const options = col.config?.url ? dynamicOptions[col.id] : col.config?.options;
+            case 'select':
+                const options = col.config?.url ? dynamicOptions[col.id] : col.config?.options;
                 return (<FormControl variant="standard" fullWidth>
-                    <Select value={value}
-                        onChange={(e) => handleCellChange(rowIndex,
-                            col.id,
-                            e.target.value)}>{(options || []).map(opt => <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>)}</Select>
+                    <Select value={value} onChange={(e) => handleCellChange(rowIndex, col.id, e.target.value)}>
+                        {(options || []).map(opt => <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>)}
+                    </Select>
                 </FormControl>);
-            case 'currency': return (<TextField variant="standard" type="number" value={value}
-                onChange={(e) => handleCellChange(rowIndex,
-                    col.id,
-                    e.target.value)} fullWidth InputProps={{ endAdornment: <InputAdornment position="end">VND</InputAdornment> }} />);
-            case 'number': case 'text': case 'date': default: return (<TextField variant="standard" type={col.type} value={value}
-                onChange={(e) => handleCellChange(rowIndex,
-                    col.id,
-                    e.target.value)} fullWidth InputLabelProps={col.type === 'date' ? { shrink: true } : {}} />);
+            case 'currency':
+                return (<TextField variant="standard" type="number" value={value}
+                    onChange={(e) => handleCellChange(rowIndex, col.id, e.target.value)} fullWidth InputProps={{ endAdornment: <InputAdornment position="end">VND</InputAdornment> }} />);
+
+            case 'number':
+            case 'text':
+            case 'date':
+            default:
+                return (<TextField variant="standard" type={col.type} value={value}
+                    onChange={(e) => handleCellChange(rowIndex,
+                        col.id,
+                        e.target.value)} fullWidth InputLabelProps={col.type === 'date' ? { shrink: true } : {}} />);
         }
     };
 
@@ -216,7 +199,7 @@ const DynamicTableComponent: React.FC<DynamicTableComponentProps> = ({ tableConf
 
     const visibleColumns = localColumns.filter(c => c.visible !== false);
     return (<Paper variant="outlined" sx={{ p: 2 }}>
-        <Typography variant="h6" gutterBottom>{tableConfig.label}</Typography>
+        <Typography variant="h6" gutterBottom>{label}</Typography>
         <TableContainer>
             <Table size="small">
                 <TableHead>
@@ -226,20 +209,20 @@ const DynamicTableComponent: React.FC<DynamicTableComponentProps> = ({ tableConf
                     }}>{col.label}</TableCell>)}<TableCell align="right">Hành động</TableCell>
                     </TableRow>
                 </TableHead>
-                <TableBody>{(tableData || []).map((row,
-                    rowIndex) => (<TableRow key={rowIndex}>{visibleColumns.map(col => (<TableCell key={col.id} sx={{
-                        backgroundColor: col.backgroundColor,
-                        color: col.color
-                    }}>{renderCellInput(row,
-                        rowIndex,
-                        col)}</TableCell>))}
+                <TableBody>
+                    {(tableData || []).map((row: any, rowIndex: number) =>
+                    (<TableRow key={rowIndex}>{visibleColumns.map(col =>
+                    (<TableCell key={col.id} sx={{ backgroundColor: col.backgroundColor, color: col.color }}>
+                        {renderCellInput(row, rowIndex, col)}
+                    </TableCell>))}
                         <TableCell align="right">
                             <IconButton size="small"
                                 onClick={() => deleteRow(rowIndex)} color="error">
                                 <Delete fontSize="inherit" />
                             </IconButton>
                         </TableCell>
-                    </TableRow>))}</TableBody>
+                    </TableRow>))}
+                </TableBody>
             </Table>
         </TableContainer>
         <Button startIcon={<Add />}

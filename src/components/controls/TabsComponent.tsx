@@ -56,6 +56,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ componentId,
         setActiveTab] = useState(0);
     const handleTabChange = (event: React.SyntheticEvent,
         newValue: number) => setActiveTab(newValue);
+        
     const renderLayoutItem = (item: LayoutItem,
         index: number,
         array: LayoutItem[]) => {

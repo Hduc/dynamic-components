@@ -1,31 +1,23 @@
 import { Autocomplete, CircularProgress, FormControl, FormControlLabel, FormHelperText, Radio, RadioGroup, TextField, Typography } from "@mui/material";
 import { FieldConfig, FieldOption } from "../../types/field";
-import { DynFormData } from '../../types'
 import { useEffect, useState } from "react";
 import { mockApi } from "../../config/mockApi";
+import { useDynamicLayout } from "../../hooks/useDynamicLayout";
 
-interface DynamicFieldProps {
-    fieldConfig: FieldConfig;
-    formData: DynFormData;
-    onFieldChange: (fieldId: string, value: any) => void;
-    errorText?: string;
-}
 
-const DynamicField: React.FC<DynamicFieldProps> = ({
-    fieldConfig,
-    formData,
-    onFieldChange,
-    errorText
-}) => {
+const DynamicField: React.FC<FieldConfig> = ({ id, label, type, config, validation, dependsOn }) => {
+    const { formData, errors, handleFieldChangeAndActions } = useDynamicLayout()
+
     const [options, setOptions] = useState<FieldOption[]>([]);
     const [loading, setLoading] = useState(false);
-    const dependentFieldValue = fieldConfig.dependsOn ? formData[fieldConfig.dependsOn] : null;
+    const dependentFieldValue = dependsOn ? formData[dependsOn] : null;
 
-    const isDependentAndParentUnselected = !!fieldConfig.dependsOn && !dependentFieldValue;
+    const isDependentAndParentUnselected = !!dependsOn && !dependentFieldValue;
+    const errorText = errors[id]
 
     useEffect(() => {
-        if (fieldConfig.type !== 'select' || !fieldConfig.config?.url) {
-            setOptions(fieldConfig.config?.options || []);
+        if (type !== 'select' || !config?.url) {
+            setOptions(config?.options || []);
             return;
         }
         if (isDependentAndParentUnselected) {
@@ -37,7 +29,7 @@ const DynamicField: React.FC<DynamicFieldProps> = ({
             setLoading(true);
             try {
                 let data;
-                if (fieldConfig.config?.url === '/api/customers') data = await mockApi.getCustomers();
+                if (config?.url === '/api/customers') data = await mockApi.getCustomers();
                 if (isActive && data) setOptions(data);
             } catch (error) {
                 console.error("Lỗi tải dữ liệu cho Select:",
@@ -51,71 +43,65 @@ const DynamicField: React.FC<DynamicFieldProps> = ({
         return () => {
             isActive = false;
         };
-    }, [fieldConfig.type, fieldConfig.config, dependentFieldValue, isDependentAndParentUnselected]);
+    }, [type, config, dependentFieldValue, isDependentAndParentUnselected]);
 
     const handleChange = (event: any) => {
         const { value, type } = event.target;
         const finalValue = (type === 'checkbox' && 'checked' in event.target) ? (event.target as HTMLInputElement).checked : value;
 
-        onFieldChange(fieldConfig.id, finalValue);
+        handleFieldChangeAndActions(id, finalValue);
     };
 
     const commonProps = {
-        label: fieldConfig.label,
-        value: formData[fieldConfig.id] || '',
+        label: label,
+        value: formData[id] || '',
 
         onChange: handleChange,
-        required: fieldConfig.validation?.required,
+        required: validation?.required,
         error: !!errorText,
-        helperText: errorText || fieldConfig.config?.helperText,
+        helperText: errorText || config?.helperText,
         InputLabelProps: { shrink: true }
     };
 
-    switch (fieldConfig.type) {
+    switch (type) {
         case 'text':
         case 'number':
         case 'color':
         case 'datetime-local':
-            return <TextField fullWidth type={fieldConfig.type} {...commonProps} />;
+            return <TextField fullWidth type={type} {...commonProps} />;
         case 'date':
             return <TextField fullWidth type="date" {...commonProps} />;
         case 'radio':
             return (<FormControl component="fieldset"
-                required={fieldConfig.validation?.required}>
-                <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>{fieldConfig.label}</Typography>
-                <RadioGroup row name={fieldConfig.id} value={formData[fieldConfig.id] || ''}
+                required={validation?.required}>
+                <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>{label}</Typography>
+                <RadioGroup row name={id} value={formData[id] || ''}
                     onChange={handleChange}>
-                    {(fieldConfig.config?.options || []).map((opt: any) => <FormControlLabel key={opt.value} value={opt.value} control={<Radio />} label={opt.label} />)}
+                    {(config?.options || []).map((opt: any) => <FormControlLabel key={opt.value} value={opt.value} control={<Radio />} label={opt.label} />)}
                 </RadioGroup>
                 {errorText && <FormHelperText error>{errorText}</FormHelperText>}
             </FormControl>);
         case 'select':
-            const selectedValue = formData[fieldConfig.id] || null;
-            const valueField = fieldConfig.config?.valueField || 'value';
-            const labelField = fieldConfig.config?.labelField || 'label';
+            const selectedValue = formData[id] || null;
+            const valueField = config?.valueField || 'value';
+            const labelField = config?.labelField || 'label';
             const selectedOption = options.find((opt: any) => opt[valueField] === selectedValue) || null;
             return (
                 <Autocomplete
                     options={options}
                     getOptionLabel={(option) => option[labelField] || ''}
                     value={selectedOption}
-
-                    onChange={(event,
-                        newValue) => {
-
-                        onFieldChange(fieldConfig.id,
-                            newValue ? newValue[valueField] : '');
-                    }}
+                    onChange={(event, newValue) => { handleFieldChangeAndActions(id, newValue ? newValue[valueField] : ''); }}
                     loading={loading}
                     disabled={isDependentAndParentUnselected || loading}
                     isOptionEqualToValue={(option, value) => option[valueField] === value[valueField]}
                     renderInput={(params) => (
                         <TextField
                             {...params}
-                            label={fieldConfig.label}
-                            required={fieldConfig.validation?.required}
+                            label={label}
+                            required={validation?.required}
                             error={!!errorText}
-                            helperText={errorText || fieldConfig.config?.helperText}
+                            helperText={errorText || config?.helperText}
                             InputProps={{
                                 ...params.InputProps,
                                 endAdornment: (
@@ -129,7 +115,7 @@ const DynamicField: React.FC<DynamicFieldProps> = ({
                     )}
                 />
             );
-        default: return <Typography color="error">Loại trường không xác định: {fieldConfig.type}</Typography>;
+        default: return <Typography color="error">Loại trường không xác định: {type}</Typography>;
     }
 };
 
