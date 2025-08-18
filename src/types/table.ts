@@ -1,3 +1,5 @@
+import { BaseLayoutItemConfig } from ".";
+
 export interface TableColumnOption {
     value: string | number;
     label: string;
@@ -17,8 +19,7 @@ export interface TableColumn {
     }
 }
 
-export interface TableConfig {
-    id: string;
+export interface TableConfig extends BaseLayoutItemConfig {
     label: string;
     columns: TableColumn[];
     columnsApiUrl?: string;

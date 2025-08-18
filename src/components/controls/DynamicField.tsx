@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { mockApi } from "../../config/mockApi";
 import { useDynamicLayout } from "../../hooks/useDynamicLayout";
 
-
-const DynamicField: React.FC<FieldConfig> = ({ id, label, type, config, validation, dependsOn }) => {
+const DynamicField:React.FC<FieldConfig> = ({ id, label, inputType, config, validation, dependsOn }) => {
     const { formData, errors, handleFieldChangeAndActions } = useDynamicLayout()
 
     const [options, setOptions] = useState<FieldOption[]>([]);
@@ -16,7 +15,7 @@ const DynamicField: React.FC<FieldConfig> = ({ id, label, type, config, validati
     const errorText = errors[id]
 
     useEffect(() => {
-        if (type !== 'select' || !config?.url) {
+        if (inputType !== 'select' || !config?.url) {
             setOptions(config?.options || []);
             return;
         }
@@ -43,7 +42,7 @@ const DynamicField: React.FC<FieldConfig> = ({ id, label, type, config, validati
         return () => {
             isActive = false;
         };
-    }, [type, config, dependentFieldValue, isDependentAndParentUnselected]);
+    }, [inputType, config, dependentFieldValue, isDependentAndParentUnselected]);
 
     const handleChange = (event: any) => {
         const { value, type } = event.target;
@@ -63,12 +62,12 @@ const DynamicField: React.FC<FieldConfig> = ({ id, label, type, config, validati
         InputLabelProps: { shrink: true }
     };
 
-    switch (type) {
+    switch (inputType) {
         case 'text':
         case 'number':
         case 'color':
         case 'datetime-local':
-            return <TextField fullWidth type={type} {...commonProps} />;
+            return <TextField fullWidth type={inputType} {...commonProps} />;
         case 'date':
             return <TextField fullWidth type="date" {...commonProps} />;
         case 'radio':
@@ -115,7 +114,7 @@ const DynamicField: React.FC<FieldConfig> = ({ id, label, type, config, validati
                     )}
                 />
             );
-        default: return <Typography color="error">Loại trường không xác định: {type}</Typography>;
+        default: return <Typography color="error">Loại trường không xác định: {inputType}</Typography>;
     }
 };
 

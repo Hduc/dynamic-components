@@ -1,10 +1,11 @@
 import { Button } from "@mui/material";
-import { ButtonConfig } from "../../types/button";
 import { useDynamicLayout } from "../../hooks/useDynamicLayout";
+import { LayoutItemConfig } from "../../types";
+import { ButtonConfig } from "../../types/button";
 
-const DynamicButton: React.FC<ButtonConfig> = ({ label,config }) => {
-    const {executeAction} = useDynamicLayout()
-    
+const DynamicButton: React.FC<ButtonConfig> = ({ id, label, config }) => {
+    const { executeAction } = useDynamicLayout()
+
     const handleClick = () => {
         if (config && config.onClickAction) {
             executeAction(config.onClickAction);

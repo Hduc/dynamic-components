@@ -195,3 +195,494 @@ export const phieuChiConfig = {
     }
   ]
 }
+
+export const formPhieuChi =[
+  {
+      "id": "field_1754883700809",
+      "type": "field",
+      "config": {
+          "id": "Ngay_ct",
+          "type": "date",
+          "label": "Ngày chứng từ",
+          "grid": 3,
+          "validation": {
+              "required": true
+          },
+          "config": {
+              "defaultValue": "now"
+          }
+      }
+  },
+  {
+      "id": "field_1754883704802",
+      "type": "field",
+      "config": {
+          "id": "So_ct",
+          "type": "text",
+          "label": "Số chứng từ",
+          "grid": 3,
+          "validation": {
+              "required": true,
+              "urlLoad": "Common/GetVoucherNo?ma_Cty={maCty}&ma_Ct=CA2"
+          },
+          "config": {}
+      }
+  },
+  {
+      "id": "field_1754883855399",
+      "type": "field",
+      "config": {
+          "id": "Ngay_lct",
+          "type": "date",
+          "label": "Ngày lập",
+          "grid": 3,
+          "validation": {
+              "required": true
+          },
+          "config": {
+              "defaultValue": "now"
+          }
+      }
+  },
+  {
+      "id": "field_1754883880436",
+      "type": "field",
+      "config": {
+          "id": "Ma_nt",
+          "type": "select",
+          "label": "Tỷ giá",
+          "grid": 2,
+          "validation": {
+              "required": true
+          },
+          "config": {
+              "options": [
+                  {
+                      "value": "vnd",
+                      "label": "VND"
+                  },
+                  {
+                      "value": "usd",
+                      "label": "USD"
+                  },
+                  {
+                      "value": "eur",
+                      "label": "EUR"
+                  }
+              ]
+          }
+      }
+  },
+  {
+      "id": "field_1754884140142",
+      "type": "field",
+      "config": {
+          "id": "Ty_gia",
+          "type": "number",
+          "label": "Số tỷ giá",
+          "grid": 1,
+          "validation": {
+              "required": true,
+              "minValue": "0"
+          },
+          "config": {}
+      }
+  },
+  {
+      "id": "field_1754884189733",
+      "type": "field",
+      "config": {
+          "id": "Stt_rec_dn",
+          "type": "text",
+          "label": "Số đề nghị",
+          "grid": 4,
+          "validation": {
+              "required": false
+          },
+          "config": {
+              "url": ""
+          }
+      }
+  },
+  {
+      "id": "field_1754884269381",
+      "type": "field",
+      "config": {
+          "id": "So_ct_kem",
+          "type": "text",
+          "label": "Số chứng từ kèm theo",
+          "grid": 4,
+          "validation": {
+              "required": false
+          },
+          "config": {}
+      }
+  },
+  {
+      "id": "field_1754884404655",
+      "type": "field",
+      "config": {
+          "id": "Tk_co",
+          "type": "select",
+          "label": "Tài khoản có",
+          "grid": 4,
+          "validation": {
+              "required": true
+          },
+          "config": {
+              "url": "Common/GetCommonInfo?func=lstAccount",
+              "valueField": "tk",
+              "labelField": "{tk} - {ten_tk}"
+          }
+      }
+  },
+  {
+      "id": "field_1754884541538",
+      "type": "field",
+      "config": {
+          "id": "IDcustomer",
+          "type": "select",
+          "label": "Đối tượng",
+          "grid": 6,
+          "validation": {
+              "required": true
+          },
+          "config": {
+              "url": "Common/GetCommonInfo?func=lstCustomer",
+              "valueField": "idcustomer",
+              "labelField": "{idcustomer} - {ten_kh}"
+          }
+      }
+  },
+  {
+      "id": "field_1754884586808",
+      "type": "field",
+      "config": {
+          "id": "Dia_chi",
+          "type": "text",
+          "label": "Địa chỉ",
+          "grid": 6,
+          "validation": {
+              "required": false
+          },
+          "config": {}
+      }
+  },
+  {
+      "id": "field_1754884611644",
+      "type": "field",
+      "config": {
+          "id": "Nguoi_gd",
+          "type": "text",
+          "label": "Người giao dịch",
+          "grid": 6,
+          "validation": {
+              "required": false
+          },
+          "config": {}
+      }
+  },
+  {
+      "id": "field_1754884643711",
+      "type": "field",
+      "config": {
+          "id": "Dien_giai",
+          "type": "text",
+          "label": "Diễn giải",
+          "grid": 6,
+          "validation": {
+              "required": false
+          },
+          "config": {}
+      }
+  },
+  {
+      "id": "tabs_1754973852706",
+      "type": "tabs",
+      "config": {
+          "tabs": [
+              {
+                  "id": "tab_1754973852706",
+                  "label": "Chi tiết",
+                  "items": [
+                      {
+                          "id": "table_1754978516601",
+                          "type": "table",
+                          "config": {
+                              "id": "CaVch02d0Data",
+                              "label": "",
+                              "columns": [
+                                  {
+                                      "id": "Tk_no",
+                                      "label": "TK",
+                                      "type": "select",
+                                      "config": {
+                                          "options": [
+                                              {
+                                                  "value": "11111",
+                                                  "label": "11111- Tiền việt nam"
+                                              }
+                                          ]
+                                      }
+                                  },
+                                  {
+                                      "id": "Ps_no_nt",
+                                      "label": "Số tiền",
+                                      "type": "text"
+                                  },
+                                  {
+                                      "id": "Dien_giai",
+                                      "label": "Diễn giải",
+                                      "type": "text"
+                                  },
+                                  {
+                                      "id": "Ma_bp",
+                                      "label": "Bộ phận",
+                                      "type": "select",
+                                      "config": {
+                                          "options": [
+                                              {
+                                                  "value": "00000",
+                                                  "label": "Công ty"
+                                              }
+                                          ]
+                                      }
+                                  },
+                                  {
+                                      "id": "Ma_phi",
+                                      "label": "Phí",
+                                      "type": "select",
+                                      "config": {
+                                          "options": [
+                                              {
+                                                  "value": "N23NHIENLIEU",
+                                                  "label": "chi phí xăng đầu, xăng xe"
+                                              }
+                                          ]
+                                      }
+                                  },
+                                  {
+                                      "id": "Ma_hd",
+                                      "label": "Hợp đồng",
+                                      "type": "select",
+                                      "config": {
+                                          "options": [
+                                              {
+                                                  "value": "030917",
+                                                  "label": "HD Dịch vụ"
+                                              }
+                                          ]
+                                      }
+                                  },
+                                  {
+                                      "id": "Ma_ku",
+                                      "label": "Kế ước",
+                                      "type": "select",
+                                      "config": {
+                                          "options": [
+                                              {
+                                                  "value": "",
+                                                  "label": ""
+                                              }
+                                          ]
+                                      }
+                                  },
+                                  {
+                                      "id": "Ma_spct",
+                                      "label": "SPCT",
+                                      "type": "select",
+                                      "config": {
+                                          "options": [
+                                              {
+                                                  "value": "â",
+                                                  "label": "Bộ trà 0.7"
+                                              }
+                                          ]
+                                      }
+                                  }
+                              ],
+                              "tableType": "CaVch01D0Type",
+                              "columnsApiUrl": "Common/GetTableDefine?moduleID=CA2_CT&pageID=04.10.05",
+                              "dataApiUrl": "DynamicStore/spCaVch02D0Get,{Ma_cty:{maCty},Stt_rec:{masterId}}"
+                          }
+                      }
+                  ]
+              },
+              {
+                  "id": "tab_1754985674856",
+                  "label": "thuế GTGT vào",
+                  "items": [
+                      {
+                          "id": "table_1754985712349",
+                          "type": "table",
+                          "config": {
+                              "id": "TaxInData",
+                              "label": "",
+                              "columns": [
+                                  {
+                                      "id": "phanloai",
+                                      "label": "Phân loại",
+                                      "type": "select",
+                                      "config": {
+                                          "options": [
+                                              {
+                                                  "value": "1",
+                                                  "label": "HHDV"
+                                              }
+                                          ]
+                                      }
+                                  },
+                                  {
+                                      "id": "Ghi_chu",
+                                      "label": "Mẫu số",
+                                      "type": "text",
+                                      "config": {
+                                          "options": [
+                                              {
+                                                  "value": "",
+                                                  "label": ""
+                                              }
+                                          ]
+                                      }
+                                  },
+                                  {
+                                      "id": "So_seri0",
+                                      "label": "Ký hiệu",
+                                      "type": "text"
+                                  },
+                                  {
+                                      "id": "So_ct0",
+                                      "label": "Số HĐ",
+                                      "type": "text"
+                                  },
+                                  {
+                                      "id": "Ngay_ct0",
+                                      "label": "Ngày HĐ",
+                                      "type": "date"
+                                  },
+                                  {
+                                      "id": "IDCustomer",
+                                      "label": "Tên KH",
+                                      "type": "select",
+                                      "config": {
+                                          "options": [
+                                              {
+                                                  "value": "1",
+                                                  "label": "FOSHAn"
+                                              }
+                                          ]
+                                      }
+                                  },
+                                  {
+                                      "id": "Dia_chi",
+                                      "label": "Địa chỉ",
+                                      "type": "text"
+                                  },
+                                  {
+                                      "id": "Ma_so_thue",
+                                      "label": "Mã số thuế",
+                                      "type": "text"
+                                  },
+                                  {
+                                      "id": "IDItem",
+                                      "label": "Mã vật tư",
+                                      "type": "select",
+                                      "config": {
+                                          "options": [
+                                              {
+                                                  "value": "12454",
+                                                  "label": "Công cụ"
+                                              }
+                                          ]
+                                      }
+                                  },
+                                  {
+                                      "id": "Ten_vt",
+                                      "label": "Tên vật tư",
+                                      "type": "text"
+                                  },
+                                  {
+                                      "id": "Tien_hang_nt",
+                                      "label": "Tiền hàng",
+                                      "type": "currency"
+                                  },
+                                  {
+                                      "id": "Thue_suat",
+                                      "label": "Thuế suất",
+                                      "type": "number",
+                                      "config": {
+                                          "options": [
+                                              {
+                                                  "value": "",
+                                                  "label": ""
+                                              }
+                                          ]
+                                      }
+                                  },
+                                  {
+                                      "id": "T_thue_nt",
+                                      "label": "Tiền thuế",
+                                      "type": "currency"
+                                  },
+                                  {
+                                      "id": "Tk_thue_no",
+                                      "label": "TK thúe",
+                                      "type": "select",
+                                      "config": {
+                                          "options": [
+                                              {
+                                                  "value": "111111",
+                                                  "label": "11111- TK"
+                                              }
+                                          ]
+                                      }
+                                  },
+                                  {
+                                      "id": "Tk_du",
+                                      "label": "TK đối ứng",
+                                      "type": "select",
+                                      "config": {
+                                          "options": [
+                                              {
+                                                  "value": "11111",
+                                                  "label": "1111-tk"
+                                              }
+                                          ]
+                                      }
+                                  },
+                                  {
+                                      "id": "Ma_bp",
+                                      "label": "Bô phận",
+                                      "type": "select",
+                                      "config": {
+                                          "options": [
+                                              {
+                                                  "value": "sp",
+                                                  "label": "Bộ phận"
+                                              }
+                                          ]
+                                      }
+                                  },
+                                  {
+                                      "id": "Ma_spct",
+                                      "label": "Mã SPCT",
+                                      "type": "select",
+                                      "config": {
+                                          "options": [
+                                              {
+                                                  "value": "1545",
+                                                  "label": "Sản phẩm"
+                                              }
+                                          ]
+                                      }
+                                  }
+                              ],
+                              "tableType": "TaxInCtType"
+                          }
+                      }
+                  ]
+              }
+          ]
+      }
+  }
+]

@@ -6,6 +6,7 @@ export const defaultLayout: Layout = [
     id: 'invoice_details',
     type: 'table',
     config: {
+      type: 'table',
       id: 'invoice_details',
       label: 'Hóa đơn chi tiết (với công thức)',
       columns: [

@@ -1,12 +1,12 @@
 import { Alert, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from "@mui/material";
 import { useState } from "react";
-import { FieldLayoutItem, LayoutItem } from "../../types";
+import { Layout } from "../../types";
 import { FieldConfig } from "../../types/field";
 import { AutoAwesome } from "@mui/icons-material";
 import { useDynamicLayout } from "../../hooks/useDynamicLayout";
 
 const AIFormDialog = () => {
-    const {isAiDialogOpen,setAiDialogOpen,handleAiGenerate} = useDynamicLayout()
+    const { isAiDialogOpen, setAiDialogOpen, handleAiGenerate } = useDynamicLayout()
 
     const [aiPrompt, setAiPrompt] = useState('Một form đăng ký sự kiện có họ tên,email, số điện thoại và số người tham dự.');
     const [isGenerating, setIsGenerating] = useState(false);
@@ -85,7 +85,7 @@ const AIFormDialog = () => {
             const result = await response.json();
             if (result.candidates?.[0]) {
                 const generatedFields = JSON.parse(result.candidates[0].content.parts[0].text);
-                const layoutItems: FieldLayoutItem[] = generatedFields.map((field: FieldConfig) => ({
+                const layoutItems: Layout = generatedFields.map((field: FieldConfig) => ({
                     id: field.id,
                     type: 'field',
                     config: field

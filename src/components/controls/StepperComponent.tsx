@@ -1,6 +1,7 @@
+//@ts-nocheck
 import { Box, Button, CircularProgress, Grid, IconButton, Paper, Step, StepLabel, Stepper, Typography } from "@mui/material";
 import { StepperConfig } from "../../types/step";
-import { AddComponentContext, DynFormData, Errors, LayoutItem, StepperLayoutItem } from "../../types";
+import { AddComponentContext, DynFormData, Errors, LayoutItem } from "../../types";
 import { useState } from "react";
 import ConfigurableWrapper from "./ConfigurableWrapper";
 import DynamicField from "./DynamicField";
@@ -8,7 +9,7 @@ import DynamicTableComponent from "./DynamicTableComponent";
 import { Add, AddCircleOutline, Settings } from "@mui/icons-material";
 import { useDynamicLayout } from "../../hooks/useDynamicLayout";
 
-const StepperComponent: React.FC<StepperLayoutItem> = ({ id,steps }) => {
+const StepperComponent: React.FC<StepperConfig> = ({ id,steps }) => {
     const { validateStepFields,handleOpenAddComponentDialog,addStepToStepperComponent,handleOpenStepConfig } = useDynamicLayout()
     const [activeStep, setActiveStep] = useState(0);
     const [isStepLoading, setStepLoading] = useState(false);

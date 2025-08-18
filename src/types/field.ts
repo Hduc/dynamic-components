@@ -1,13 +1,12 @@
+import { BaseLayoutItemConfig } from ".";
+
 export interface FieldAction {
     action?: string// 'FETCH_AND_UPDATE';
     targetField?: string
     apiUrl: string;
-    // e.g.,/api/customers/{value}
     targets?: {
         sourceKey: string;
-        // Key from API response. Use '.' for direct response.
         destinationField: string;
-        // ID of the form field to update.
     }[];
 }
 export interface FieldOption {
@@ -35,9 +34,8 @@ export interface ExtraFieldConfig {
 
     onValueChange?: FieldAction[];
 }
-export interface FieldConfig {
-    id: string;
-    type: 'text' | 'number' | 'date' | 'datetime-local' | 'color' | 'radio' | 'select';
+export interface FieldConfig extends BaseLayoutItemConfig{
+    inputType: 'text' | 'number' | 'date' | 'datetime-local' | 'color' | 'radio' | 'select';
     label: string;
     grid: number;
     validation?: FieldValidation;

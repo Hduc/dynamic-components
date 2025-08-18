@@ -1,13 +1,13 @@
-import { useCallback, useEffect, useState } from "react";
-import { AddComponentContext, DynFormData, Errors, FieldLayoutItem, IDynamicForm, Layout, LayoutItem, LayoutItemConfig, StepperLayoutItem, TabsLayoutItem } from "../types";
+import { createContext, useEffect, useState } from "react";
+import { AddComponentContext, BaseLayoutItem, DynFormData, Errors, IDynamicForm, Layout, LayoutItem, LayoutItemConfig } from "../types";
 import { mockApi } from "../config/mockApi";
 import { parseDateExpression } from "../components/common/fuc_common";
 import { StepItem } from "../types/step";
-import { TabItem } from "../types/tab";
+import { TabItem, TabsConfig } from "../types/tab";
 
 export function useDynamicLayout() {
   const [infoForm, setInfoForm] = useState<Partial<IDynamicForm>>({})
-  const [layout, setLayout] = useState<LayoutItem[]>([]);
+  const [layout, setLayout] = useState<Layout>([]);
   const [formData, setFormData] = useState<DynFormData>({});
   const [errors, setErrors] = useState<Errors>({});
   const [isAddComponentOpen, setAddComponentOpen] = useState(false);
@@ -103,9 +103,9 @@ export function useDynamicLayout() {
     }
   };
 
-  const validateStepFields = (itemsToValidate: LayoutItem[]): Errors => {
+  const validateStepFields = (itemsToValidate: Layout): Errors => {
     const stepErrors: Errors = {};
-    const fieldConfigs = itemsToValidate.filter((i): i is FieldLayoutItem => i.type === 'field').map(i => i.config);
+    const fieldConfigs = itemsToValidate.filter((i): i is BaseLayoutItem<'field'> => i.type === 'field').map(i => i.config);
 
     fieldConfigs.forEach(fieldConfig => {
       const value = formData[fieldConfig.id];
@@ -161,17 +161,14 @@ export function useDynamicLayout() {
 
 
   useEffect(() => {
-    const processDefaultValues = (items: LayoutItem[],
+    const processDefaultValues = (items: Layout,
       initialData: DynFormData): DynFormData => {
       let data = { ...initialData };
       items.forEach(item => {
         if (item.type === 'field') {
-          const { id,
-            type,
-            config } = item.config;
-          if ((type === 'date' || type === 'datetime-local') && config?.defaultValue && data[id] === undefined) {
-            const val = parseDateExpression(config.defaultValue,
-              type);
+          const { id, inputType, config } = item.config;
+          if ((inputType === 'date' || inputType === 'datetime-local') && config?.defaultValue && data[id] === undefined) {
+            const val = parseDateExpression(config.defaultValue, inputType);
             if (val) data[id] = val;
           }
         } else if (item.type === 'tabs') {
@@ -204,7 +201,7 @@ export function useDynamicLayout() {
 
 
   useEffect(() => {
-    const flattenLayout = (items: LayoutItem[]): {
+    const flattenLayout = (items: Layout): {
       fields: { id: string, label: string }[],
       tables: { id: string, label: string }[]
     } => {
@@ -220,15 +217,15 @@ export function useDynamicLayout() {
           label: item.config.label
         });
         else if (item.type === 'tabs') {
-          const nested = item.config.tabs.map(tab => flattenLayout(tab.items));
-          nested.forEach(n => {
+          const nested = item.config.tabs.map((tab: any) => flattenLayout(tab.items));
+          nested.forEach((n: any) => {
             fields = fields.concat(n.fields);
             tables = tables.concat(n.tables);
           })
         }
         else if (item.type === 'stepper') {
-          const nested = item.config.steps.map(step => flattenLayout(step.items));
-          nested.forEach(n => {
+          const nested = item.config.steps.map((step: any) => flattenLayout(step.items));
+          nested.forEach((n: any) => {
             fields = fields.concat(n.fields);
             tables = tables.concat(n.tables);
           })
@@ -263,7 +260,7 @@ export function useDynamicLayout() {
     } return null;
   };
 
-  const findLayoutItem = (items: LayoutItem[], id: string): LayoutItem | null => {
+  const findLayoutItem = (items: Layout, id: string): LayoutItem | null => {
     for (const item of items) {
       if (item.id === id) return item;
       if (item.type === 'tabs') {
@@ -283,10 +280,10 @@ export function useDynamicLayout() {
   };
 
 
-  const findAndModifyLayout = (items: LayoutItem[], id: string, callback: (item: LayoutItem) => LayoutItem | null): LayoutItem[] => items.map(item => {
+  const findAndModifyLayout = (items: Layout, id: string, callback: (item: LayoutItem) => LayoutItem | null): Layout => items.map(item => {
     if (item.id === id) return callback(item);
     if (item.type === 'tabs') {
-      const newTabs = item.config.tabs.map(tab => ({
+      const newTabs = item.config.tabs.map((tab: any) => ({
         ...tab,
         items: findAndModifyLayout(tab.items,
           id,
@@ -300,7 +297,7 @@ export function useDynamicLayout() {
         }
       };
     } if (item.type === 'stepper') {
-      const newSteps = item.config.steps.map(step => ({
+      const newSteps = item.config.steps.map((step: any) => ({
         ...step,
         items: findAndModifyLayout(step.items,
           id,
@@ -330,8 +327,7 @@ export function useDynamicLayout() {
       });
     }
 
-    const fieldLayoutItem = findLayoutItem(layout,
-      fieldId) as FieldLayoutItem | null;
+    const fieldLayoutItem = findLayoutItem(layout, fieldId) as BaseLayoutItem<'field'> | undefined;
 
     if (!fieldLayoutItem || !fieldLayoutItem.config.config?.onValueChange) {
       return;
@@ -368,7 +364,7 @@ export function useDynamicLayout() {
 
             if (responseData) {
               const updates: DynFormData = {};
-              action.targets && action.targets.forEach(target => {
+              action.targets && action.targets.forEach((target: any) => {
                 const sourceValue = target.sourceKey === '.' ? responseData : responseData[target.sourceKey];
                 if (sourceValue !== undefined) {
                   updates[target.destinationField] = sourceValue;
@@ -398,6 +394,7 @@ export function useDynamicLayout() {
   const handleTableChange = (tableId: string, data: any[]) => setFormData(prev => ({ ...prev, [tableId]: data }));
 
   const addComponent = (type: LayoutItem['type']) => {
+    debugger
     if (!addComponentContext) return;
 
     const { parentId,
@@ -412,8 +409,9 @@ export function useDynamicLayout() {
         id,
         type: 'field',
         config: {
+          type: 'field',
           id,
-          type: 'text',
+          inputType: 'text',
           label: 'Trường mới',
           grid: 12,
           validation: { required: false },
@@ -426,6 +424,7 @@ export function useDynamicLayout() {
         type: 'table',
         config: {
           id,
+          type: 'table',
           label: 'Bảng mới',
           columns: [{
             id: 'col1',
@@ -445,6 +444,7 @@ export function useDynamicLayout() {
         type: 'button',
         config: {
           id,
+          type: 'button',
           label: 'Nút hành động',
           grid: 3,
           config: {
@@ -459,6 +459,8 @@ export function useDynamicLayout() {
         id,
         type: 'tabs',
         config: {
+          id,
+          type: 'tabs',
           tabs: [{
             id: `tab_${Date.now()}`,
             label: 'Tab 1',
@@ -471,6 +473,8 @@ export function useDynamicLayout() {
         id,
         type: 'stepper',
         config: {
+          id,
+          type: 'stepper',
           steps: [{
             id: `step_${Date.now()}`,
             label: 'Bước 1',
@@ -487,8 +491,7 @@ export function useDynamicLayout() {
     } else {
       setLayout(prevLayout => {
         const newLayout = JSON.parse(JSON.stringify(prevLayout));
-        const parentComponent = findLayoutItem(newLayout,
-          parentId);
+        const parentComponent = findLayoutItem(newLayout, parentId);
         if (parentComponent) {
           if (parentComponent.type === 'tabs' && tabIndex !== undefined) {
             parentComponent.config.tabs[tabIndex].items.push(newComponent);
@@ -499,11 +502,12 @@ export function useDynamicLayout() {
         return newLayout;
       });
     }
+    debugger
     setAddComponentOpen(false);
     setAddComponentContext(null);
   };
 
-  const handleAiGenerate = (generatedItems: LayoutItem[]) => {
+  const handleAiGenerate = (generatedItems: Layout) => {
     setLayout(generatedItems);
     setFormData({});
   };
@@ -520,6 +524,7 @@ export function useDynamicLayout() {
   };
 
   const handleOpenConfig = (itemId: string) => {
+    debugger
     setEditingItemId(itemId);
     setConfigOpen(true);
   };
@@ -556,7 +561,7 @@ export function useDynamicLayout() {
   const addTabToTabsComponent = (tabsComponentId: string) => {
     setLayout(prevLayout => {
       const newLayout = JSON.parse(JSON.stringify(prevLayout));
-      const tabsComponent = newLayout.find((c: any): c is TabsLayoutItem => c.id === tabsComponentId);
+      const tabsComponent = newLayout.find((c: any) => c.id === tabsComponentId);
       if (tabsComponent) tabsComponent.config.tabs.push({
         id: `tab_${Date.now()}`,
         label: `Tab ${tabsComponent.config.tabs.length + 1}`,
@@ -569,7 +574,7 @@ export function useDynamicLayout() {
   const addStepToStepperComponent = (stepperComponentId: string) => {
     setLayout(prevLayout => {
       const newLayout = JSON.parse(JSON.stringify(prevLayout));
-      const stepperComponent = newLayout.find((c: any): c is StepperLayoutItem => c.id === stepperComponentId);
+      const stepperComponent = newLayout.find((c: any) => c.id === stepperComponentId);
       if (stepperComponent) stepperComponent.config.steps.push({
         id: `step_${Date.now()}`,
         label: `Bước ${stepperComponent.config.steps.length + 1}`,
@@ -602,7 +607,7 @@ export function useDynamicLayout() {
 
   const handleOpenTabConfig = (componentId: string,
     tabId: string) => {
-    const tabsComponent = layout.find(c => c.id === componentId) as TabsLayoutItem | undefined;
+    const tabsComponent = layout.find(c => c.id === componentId) as BaseLayoutItem<'tabs'> | undefined;
     if (tabsComponent) {
       const tab = tabsComponent.config.tabs.find(t => t.id === tabId);
       if (tab) {
@@ -622,7 +627,7 @@ export function useDynamicLayout() {
       tabId } = editingTabInfo;
     setLayout(prevLayout => {
       const newLayout = JSON.parse(JSON.stringify(prevLayout));
-      const tabsComponent = newLayout.find((c: LayoutItem): c is TabsLayoutItem => c.id === componentId);
+      const tabsComponent = newLayout.find((c: LayoutItemConfig) => c.id === componentId) as BaseLayoutItem<'tabs'> | undefined;
       if (tabsComponent) {
         const tabToUpdate = tabsComponent.config.tabs.find((t: TabItem) => t.id === tabId);
         if (tabToUpdate) {
@@ -636,7 +641,7 @@ export function useDynamicLayout() {
 
   const handleOpenStepConfig = (componentId: string,
     stepId: string) => {
-    const stepperComponent = layout.find(c => c.id === componentId) as StepperLayoutItem | undefined;
+    const stepperComponent = layout.find(c => c.id === componentId) as BaseLayoutItem<'stepper'> | undefined;
     if (stepperComponent) {
       const step = stepperComponent.config.steps.find(s => s.id === stepId);
       if (step) {
@@ -660,7 +665,7 @@ export function useDynamicLayout() {
       stepId } = editingStepInfo;
     setLayout(prevLayout => {
       const newLayout = JSON.parse(JSON.stringify(prevLayout));
-      const stepperComponent = newLayout.find((c: LayoutItem): c is StepperLayoutItem => c.id === componentId);
+      const stepperComponent = newLayout.find((c: LayoutItemConfig) => c.id === componentId);
       if (stepperComponent) {
         const stepToUpdate = stepperComponent.config.steps.find((s: StepItem) => s.id === stepId);
         if (stepToUpdate) {
@@ -729,9 +734,8 @@ export function useDynamicLayout() {
     }
   };
 
-  const handleMoveItem = (itemId: string,
-    direction: 'up' | 'down') => {
-    const findAndReorder = (items: LayoutItem[]): LayoutItem[] => {
+  const handleMoveItem = (itemId: string, direction: 'up' | 'down') => {
+    const findAndReorder = (items: Layout): Layout => {
       const index = items.findIndex(i => i.id === itemId);
       if (index !== -1) {
         const newIndex = direction === 'up' ? index - 1 : index + 1;
@@ -745,20 +749,21 @@ export function useDynamicLayout() {
 
       return items.map(item => {
         if (item.type === 'tabs') {
-          const newTabs = item.config.tabs.map(tab => ({
+          const tabsItem = item as BaseLayoutItem<'tabs'>;
+          const newTabs = tabsItem.config.tabs.map((tab: any) => ({
             ...tab,
             items: findAndReorder(tab.items)
           }));
           return {
             ...item,
             config: {
-              ...item.config,
+              ...tabsItem.config,
               tabs: newTabs
             }
           };
         }
         if (item.type === 'stepper') {
-          const newSteps = item.config.steps.map(step => ({
+          const newSteps = item.config.steps.map((step: any) => ({
             ...step,
             items: findAndReorder(step.items)
           }));
@@ -797,7 +802,7 @@ export function useDynamicLayout() {
     allFieldsFlat,
     allTables,
     actionRegistry,
-    
+
     findItemConfig,
     setStepConfigOpen,
     setAiDialogOpen,

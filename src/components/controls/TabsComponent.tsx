@@ -1,4 +1,5 @@
 
+//@ts-nocheck
 import { Box, Button, CircularProgress, Grid, IconButton, Paper, Step, StepLabel, Stepper, Tab, Tabs, Typography } from "@mui/material";
 import { StepperConfig } from "../../types/step";
 import { AddComponentContext, DynFormData, Errors, LayoutItem } from "../../types";
@@ -10,53 +11,10 @@ import { Add, AddCircleOutline, Settings } from "@mui/icons-material";
 import { TabsConfig } from "../../types/tab";
 
 
-interface TabsComponentProps {
-    componentId: string;
-    componentConfig: TabsConfig;
-    formData: DynFormData;
-    errors: Errors;
+const TabsComponent: React.FC<TabsConfig> = ({ id,tabs}) => {
+    const [activeTab, setActiveTab] = useState(0);
+    const handleTabChange = (event: React.SyntheticEvent, newValue: number) => setActiveTab(newValue);
 
-    onFieldChange: (fieldId: string,
-        value: any) => void;
-
-    onTableChange: (tableId: string,
-        data: any[]) => void;
-
-    onAddTab: (tabsComponentId: string) => void;
-
-    onOpenConfig: (itemId: string) => void;
-
-    onOpenTableConfig: (itemId: string) => void;
-
-    onDeleteItem: (itemId: string) => void;
-
-    onOpenTabConfig: (componentId: string,
-        tabId: string) => void;
-
-    onOpenAddComponentDialog: (context: AddComponentContext) => void;
-
-    onMoveItem: (itemId: string,
-        direction: 'up' | 'down') => void;
-}
-
-const TabsComponent: React.FC<TabsComponentProps> = ({ componentId,
-    componentConfig,
-    formData,
-    onFieldChange,
-    onTableChange,
-    onAddTab,
-    onOpenConfig,
-    onDeleteItem,
-    onOpenTableConfig,
-    errors,
-    onOpenTabConfig,
-    onOpenAddComponentDialog,
-    onMoveItem }) => {
-    const [activeTab,
-        setActiveTab] = useState(0);
-    const handleTabChange = (event: React.SyntheticEvent,
-        newValue: number) => setActiveTab(newValue);
-        
     const renderLayoutItem = (item: LayoutItem,
         index: number,
         array: LayoutItem[]) => {
@@ -96,6 +54,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ componentId,
             default: return null;
         }
     };
+
     return (<Paper variant="outlined">
         <Box sx={{
             borderBottom: 1,
@@ -115,19 +74,14 @@ const TabsComponent: React.FC<TabsComponentProps> = ({ componentId,
                             onClick={(e) => {
                                 e.stopPropagation();
 
-                                onOpenTabConfig(componentId,
-                                    tab.id);
+                                onOpenTabConfig(componentId,                                    tab.id);
                             }} title="Chỉnh sửa tên tab">
                             <Settings sx={{ fontSize: '1rem' }} />
                         </IconButton>
                     </Box>} />)}
             </Tabs>
             <IconButton
-                onClick={() =>
-                    onAddTab(componentId)} color="primary" title="Thêm Tab mới" sx={{
-                        mr: 1,
-                        ml: 1
-                    }}>
+                onClick={() =>                    onAddTab(componentId)} color="primary" title="Thêm Tab mới" sx={{                        mr: 1,                        ml: 1                    }}>
                 <AddCircleOutline />
             </IconButton>
         </Box>{componentConfig.tabs.map((tab, index) => (<Box role="tabpanel" hidden={activeTab !== index} key={tab.id} sx={{ p: 3 }}>

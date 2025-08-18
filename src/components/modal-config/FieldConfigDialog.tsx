@@ -18,6 +18,7 @@ const FieldConfigDialog = () => {
   }]);
 
   useEffect(() => {
+    debugger
     if (isConfigOpen && existingFieldConfig) {
       const initialConfig = JSON.parse(JSON.stringify(existingFieldConfig));
       if (!initialConfig.validation) initialConfig.validation = {};
@@ -180,19 +181,19 @@ const FieldConfigDialog = () => {
         <Divider sx={{ my: 1 }} />
         <Typography variant="subtitle1" gutterBottom>Quy tắc xác thực (Validation)</Typography>
         <FormControlLabel control={<Checkbox name="required" checked={config.validation?.required || false}
-          onChange={handleValidationChange} />} label="Bắt buộc (Required)" />{config.type === 'text' && (<>
+          onChange={handleValidationChange} />} label="Bắt buộc (Required)" />{config.inputType === 'text' && (<>
             <TextField type="number" name="minLength" label="Độ dài tối thiểu" value={config.validation?.minLength || ''}
               onChange={handleValidationChange} fullWidth margin="dense" />
             <TextField type="number" name="maxLength" label="Độ dài tối đa" value={config.validation?.maxLength || ''}
               onChange={handleValidationChange} fullWidth margin="dense" />
             <TextField name="pattern" label="Mẫu Regex (vd: ^\\d+$)" value={config.validation?.pattern || ''}
               onChange={handleValidationChange} fullWidth margin="dense" />
-          </>)}{config.type === 'number' && (<>
+          </>)}{config.inputType === 'number' && (<>
             <TextField type="number" name="minValue" label="Giá trị tối thiểu" value={config.validation?.minValue || ''}
               onChange={handleValidationChange} fullWidth margin="dense" />
             <TextField type="number" name="maxValue" label="Giá trị tối đa" value={config.validation?.maxValue || ''}
               onChange={handleValidationChange} fullWidth margin="dense" />
-          </>)}{(config.type === 'radio' || config.type === 'select') && (<>
+          </>)}{(config.inputType === 'radio' || config.inputType === 'select') && (<>
             <Divider sx={{ my: 1 }} />
             <Paper variant="outlined" sx={{ p: 2 }}>
               <Typography variant="subtitle1" gutterBottom>Cấu hình lựa chọn</Typography>{staticOptions.map((opt,
@@ -215,7 +216,8 @@ const FieldConfigDialog = () => {
                 </Box>))}<Button
                   onClick={addOption} size="small">Thêm lựa chọn</Button>
             </Paper>
-          </>)}{config.type === 'select' && (<Paper variant="outlined" sx={{ p: 2 }}>
+          </>)}
+          {config.inputType === 'select' && (<Paper variant="outlined" sx={{ p: 2 }}>
             <Typography variant="subtitle1" gutterBottom>Hoặc tải từ API</Typography>
             <TextField name="url" label="URL API (vd: /api/provinces)" value={config.config?.url || ''}
               onChange={handleSubConfigChange} fullWidth margin="dense" helperText="Để trống nếu dùng lựa chọn tĩnh ở trên" />
@@ -231,7 +233,7 @@ const FieldConfigDialog = () => {
                   <em>Không phụ thuộc</em>
                 </MenuItem>{allFieldsFlat.filter(f => f.id !== config.id).map(f => <MenuItem key={f.id} value={f.id}>{f.label} ({f.id})</MenuItem>)}</Select>
             </FormControl>
-          </Paper>)}{(config.type === 'date' || config.type === 'datetime-local') && (<>
+          </Paper>)}{(config.inputType === 'date' || config.inputType === 'datetime-local') && (<>
             <Divider sx={{ my: 1 }} />
             <Typography variant="subtitle1" gutterBottom>Giá trị Mặc định</Typography>
             <TextField name="defaultValue" label="Biểu thức giá trị mặc định" value={config.config?.defaultValue || ''}

@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { componentRegistry } from "../../config/componentRegistry";
 import { Box, Grid, Typography } from "@mui/material";
 import { useDynamicLayout } from "../../hooks/useDynamicLayout";
 import LayoutItem from "./LayoutItem";
+import ConfigurableWrapper from "../controls/ConfigurableWrapper";
 
 interface Props {
   formKey?: string;
@@ -56,7 +56,9 @@ const LayoutView: React.FC<Props> = ({ formKey, layoutJson, data, onSubmit }) =>
         {layout.length === 0 && <Grid sx={{ xs: 12 }}>
           <Typography align="center" color="text.secondary" sx={{ p: 4 }}>Đang tải cấu hình...</Typography>
         </Grid>}
-        {layout.map((item, index, arr) => <LayoutItem Component={componentRegistry[item.type]} item={item} index={index} length={arr.length} />)}
+        {layout.map((item, index, arr) => <ConfigurableWrapper type={item.type} id={item.id} index={index} length={arr.length}>
+              <LayoutItem config={item.config} />
+            </ConfigurableWrapper>)}
       </Grid>
     </Box>
   );

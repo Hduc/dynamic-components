@@ -1,12 +1,12 @@
-import { LayoutItem } from ".";
+import { BaseLayoutItemConfig, Layout } from ".";
 
 export interface StepItem {
     id: string;
     label: string;
-    items: LayoutItem[];
+    items: Layout;
 
     onNextAction?: string;
 }
-export interface StepperConfig {
+export interface StepperConfig extends BaseLayoutItemConfig {
     steps: StepItem[];
 }

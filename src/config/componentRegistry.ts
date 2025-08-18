@@ -1,16 +1,16 @@
-import DynamicField from "../components/controls/DynamicField";
-import DynamicTableComponent from "../components/controls/DynamicTableComponent";
-import DynamicButton from "../components/controls/DynamicButton";
-import TabsComponent from "../components/controls/TabsComponent";
-import StepperComponent from "../components/controls/StepperComponent";
-import { ComponentRegistry } from "../types";
 
 
-export const componentRegistry:ComponentRegistry= {
-  field:DynamicField,
+import DynamicButton from "../components/controls/DynamicButton"
+import DynamicField from "../components/controls/DynamicField"
+import DynamicTableComponent from "../components/controls/DynamicTableComponent"
+import StepperComponent from "../components/controls/StepperComponent"
+import TabsComponent from "../components/controls/TabsComponent"
+import { LayoutItemConfigMap } from "../types"
+
+export const componentRegistry: { [K in keyof LayoutItemConfigMap]: React.FC<LayoutItemConfigMap[K]> } = {
   button: DynamicButton,
-  //input: InputControl,
-  tabs:TabsComponent,
-  table:DynamicTableComponent,
-  stepper:StepperComponent,
-};
+  field: DynamicField,
+  tabs: TabsComponent,
+  table: DynamicTableComponent,
+  stepper: StepperComponent,
+}

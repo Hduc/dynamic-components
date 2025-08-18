@@ -1,7 +1,8 @@
 import { ButtonProps } from "@mui/material";
+import { BaseLayoutItemConfig } from ".";
 
-export interface ButtonConfig {
-  id?: string;
+export interface ButtonConfig extends BaseLayoutItemConfig{
+  type: "button",
   label?: string;
   grid?: number;
   config?: {

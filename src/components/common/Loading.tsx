@@ -1,9 +1,9 @@
 import React from "react";
 
 interface LoadingProps {
-  text?: string;       // Nội dung hiển thị bên cạnh spinner
-  size?: "sm" | "md" | "lg"; // Kích thước spinner
-  fullScreen?: boolean; // Có chiếm toàn màn hình không
+  text?: string;
+  size?: "sm" | "md" | "lg";
+  fullScreen?: boolean;
 }
 
 const sizeMap = {
@@ -14,9 +14,7 @@ const sizeMap = {
 
 const Loading: React.FC<LoadingProps> = ({ text = "Loading...", size = "md", fullScreen = false }) => {
   const spinner = (
-    <div
-      className={`${sizeMap[size]} border-gray-300 border-t-blue-500 rounded-full animate-spin`}
-    />
+    <div className={`${sizeMap[size]} border-gray-300 border-t-blue-500 rounded-full animate-spin`} />
   );
 
   if (fullScreen) {

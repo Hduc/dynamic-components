@@ -1,4 +1,3 @@
-import { ComponentType } from "react";
 import { ButtonConfig } from "./button";
 import { FieldConfig } from "./field";
 import { StepperConfig } from "./step";
@@ -9,6 +8,7 @@ export type DynFormData = { [key: string]: any };
 
 export type Errors = { [key: string]: string };
 
+
 export type AddComponentContext = {
   parentId: string;
   parentType: 'root' | 'tab' | 'step';
@@ -18,31 +18,31 @@ export type AddComponentContext = {
 
 export interface LayoutItemConfigMap {
   field: FieldConfig;
+  button: ButtonConfig;
   table: TableConfig;
   tabs: TabsConfig;
   stepper: StepperConfig;
-  button: ButtonConfig;
 }
-export type LayoutItemConfig = FieldConfig | TableConfig | TabsConfig | StepperConfig  | ButtonConfig;
 
+export interface BaseLayoutItemConfig {
+  id: string
+  type: keyof LayoutItemConfigMap
+}
+
+export type LayoutItemConfig = ButtonConfig | FieldConfig | TabsConfig | StepperConfig | TableConfig
+
+// ===== Base và union LayoutItem sinh tự động =====
 export interface BaseLayoutItem<T extends keyof LayoutItemConfigMap> {
   id: string;
   type: T;
   config: LayoutItemConfigMap[T];
 }
-export type LayoutItem = {
-  [K in keyof LayoutItemConfigMap]: BaseLayoutItem<K>;
-}[keyof LayoutItemConfigMap];
+
+export type LayoutItem = {  [K in keyof LayoutItemConfigMap]: BaseLayoutItem<K>}[keyof LayoutItemConfigMap];
 
 export type Layout = LayoutItem[];
 
-// type liệt kê tên các item hợp lệ
-export type LayoutItemType = LayoutItem["type"];
-
-// type mapping: key là LayoutItemType, value là component React
-export type ComponentRegistry = {
-  [K in keyof LayoutItemConfigMap]: ComponentType<LayoutItemConfigMap[K]>;
-};
+// Tổng hợp
 export interface IDynamicForm {
   id?: string
   parentId?: string

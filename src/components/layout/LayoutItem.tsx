@@ -1,22 +1,8 @@
 import React from "react";
-import { LayoutItem as ItemType, LayoutItemType } from "../../types";
-import { Box, Button, Paper, Typography } from "@mui/material";
-import { AutoAwesome } from "@mui/icons-material";
-import ConfigurableWrapper from "../controls/ConfigurableWrapper";
+import { componentRegistry } from "../../config/componentRegistry";
+import { LayoutItemConfig, LayoutItemConfigMap } from '../../types'
 
-interface LayoutItemProps {
-  item: ItemType;
-  index: number
-  length: number
-  Component: LayoutItemType;
+export default function LayoutItem<T extends LayoutItemConfig["type"]>({ config }: {  config: LayoutItemConfigMap[T]}) {
+  const Component = componentRegistry[config.type] as React.FC<LayoutItemConfigMap[T]>
+  return <Component {...config} />
 }
-
-const LayoutItem: React.FC<LayoutItemProps> = ({ item, Component, index, length }) => {
-
-  return (<ConfigurableWrapper type={item.type} id={item.id} index={index} length={length} >
-    <Component {...item} />
-  </ConfigurableWrapper>
-  );
-};
-
-export default LayoutItem;
